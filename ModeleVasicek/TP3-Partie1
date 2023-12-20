@@ -1,0 +1,61 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+N = 30
+t = 0
+gamma = 0.25
+eta = 0.25 * 0.03
+sigma = 0.02
+r = 0.05
+r1 = 0.035
+r2 = 0.01
+rs = 0.027
+
+T = np.zeros(N)
+lim = np.zeros(N)
+B = np.zeros(N)
+A = np.zeros(N)
+Y = np.zeros(N)
+Y1 = np.zeros(N)
+Y2 = np.zeros(N)
+Y3 = np.zeros(N)
+
+limite = (eta / gamma) - 0.5 * (sigma / gamma) ** 2
+
+for i in range(N):
+    T[i] = i - 1
+    lim[i] = limite
+    B[i] = (1 / gamma) * (1 - np.exp(-gamma * T[i]))
+    A[i] = (B[i] - (T[i] - t)) * ((eta * gamma - (sigma ** 2 / 2)) / gamma ** 2) - (sigma * B[i]) ** 2 / (4 * gamma)
+
+    if (T[i] - t) != 0: # On vérifie que le dénominateur est différent de 0, afin d'éviter une erreur
+        Y[i] = -(A[i] - r * B[i]) / (T[i] - t)
+        Y1[i] = -(A[i] - r1 * B[i]) / (T[i] - t)
+        Y2[i] = -(A[i] - r2 * B[i]) / (T[i] - t)
+        Y3[i] = -(A[i] - rs * B[i]) / (T[i] - t)
+    else: # Gérer le cas où le dénominateur vaut effectivement 0
+        Y[i] = np.nan
+        Y1[i] = np.nan
+        Y2[i] = np.nan
+        Y3[i] = np.nan
+
+plt.plot(T,lim)
+plt.plot(T, Y, label='r = 0.05')
+plt.plot(T, Y1, label='r = 0.035')
+plt.plot(T, Y2, label='r = 0.01')
+plt.plot(T, Y3, label='r = 0.027')
+plt.legend()
+plt.xlabel('Maturité (T)')
+plt.ylabel('Yield (Y)')
+plt.title("Évolution de la courbe Yield pour différents r0")
+plt.show()
+
+plt.figure()
+plt.plot(T, Y3, label='r = 0.027')
+plt.legend()
+plt.xlabel('Maturité (T)')
+plt.ylabel('Yield (Y)')
+plt.title("Évolution du yield curve lorsque r0 = 0.027")
+plt.show()
+
+print('Limite Y(T) lorsque T tend vers +∞ = ', eta / gamma - 0.5 * (sigma / gamma) ** 2)
